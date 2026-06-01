@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9Axes 政治倾向多维分析测试系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        main {
+            padding: 60px 40px;
+        }
+        
+        section {
+            margin-bottom: 60px;
+        }
+        
+        h2 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+        
+        h3 {
+            font-size: 1.3em;
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        .feature-card strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: #d63384;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .directory-tree {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .requirement {
+            background: #e8f4f8;
+            padding: 15px 20px;
+            border-left: 4px solid #0288d1;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .score-range {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .score-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .score-item strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+        }
+        
+        footer p {
+            margin: 8px 0;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            main {
+                padding: 30px 20px;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 9Axes 政治倾向多维分析测试系统</h1>
+            <p>通过195道精心设计的题目，从16个维度深入分析您的政治立场</p>
+        </header>
+        
+        <main>
+            <!-- 项目概述 -->
+            <section>
+                <h2>📋 项目概述</h2>
+                <p>这是一个基于 <strong>Bash</strong> 的交互式政治倾向测试工具，通过 <span class="highlight">195道题目</span> 分析用户在 <span class="highlight">16个维度</span> 上的政治立场。该系统能够深入、全面地评估个人的多维政治观点，提供详细的分析报告。</p>
+            </section>
+            
+            <!-- 核心特性 -->
+            <section>
+                <h2>🎯 核心特性</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <strong>✨ 195道精心设计的题目</strong>
+                        <p>覆盖16个政治维度，全面深入</p>
+                    </div>
+                    <div class="feature-card">
+                        <strong>🎨 实时交互式界面</strong>
+                        <p>类似 <code>top</code> 命令的动态刷新效果</p>
+                    </div>
+                    <div class="feature-card">
+                        <strong>📊 多维度分析</strong>
+                        <p>同时评估16个独立的政治维度</p>
+                    </div>
+                    <div class="feature-card">
+                        <strong>💾 动态数据统计</strong>
+                        <p>实时更新各维度累计分值</p>
+                    </div>
+                    <div class="feature-card">
+                        <strong>🛠️ 灵活的操作方式</strong>
+                        <p>支持跳题、退出等多种选项</p>
+                    </div>
+                    <div class="feature-card">
+                        <strong>📈 详细的结果输出</strong>
+                        <p>完整的倾向分析和置信度评估</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 项目结构 -->
+            <section>
+                <h2>📁 项目结构</h2>
+                <div class="directory-tree">
+scale/<br>
+├── README.md                           # 项目主文档<br>
+├── index.html                          # HTML版本文档<br>
+├── scripts/<br>
+│   ├── 9axes-test.sh                  # 主测试脚本<br>
+│   └── utils/                         # 工具脚本目录<br>
+├── docs/<br>
+│   ├── DIMENSIONS.md                  # 16个维度详细说明<br>
+│   ├── USAGE.md                       # 使用指南<br>
+│   ├── QUESTIONS.md                   # 题库文档<br>
+│   └── RESULTS.md                     # 结果解读指南<br>
+├── config/<br>
+│   ├── settings.conf                  # 配置文件示例<br>
+│   └── themes/                        # UI主题配置<br>
+├── data/<br>
+│   └── results/                       # 测试结果存储目录<br>
+└── tests/                             # 测试用例目录
+                </div>
+            </section>
+            
+            <!-- 快速开始 -->
+            <section>
+                <h2>🚀 快速开始</h2>
+                
+                <h3>前置要求</h3>
+                <div class="requirement">
+                    <p>✓ Bash 4.0+</p>
+                    <p>✓ Unix/Linux 系统或 macOS</p>
+                    <p>✓ 标准 Linux 命令行工具</p>
+                </div>
+                
+                <h3>安装与运行</h3>
+                <pre><code># 克隆项目
+git clone https://github.com/MoHong-Chineydy/scale.git
+cd scale
+
+# 赋予脚本执行权限
+chmod +x scripts/9axes-test.sh
+
+# 运行测试
+./scripts/9axes-test.sh</code></pre>
+            </section>
+            
+            <!-- 使用指南 -->
+            <section>
+                <h2>📖 使用指南</h2>
+                
+                <h3>操作说明</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>按键</th>
+                            <th>功能</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>1-5</code></td>
+                            <td>提交答案（1=非常反对，5=非常同意）</td>
+                        </tr>
+                        <tr>
+                            <td><code>0</code> 或 <code>回车</code></td>
+                            <td>跳过当前题目</td>
+                        </tr>
+                        <tr>
+                            <td><code>q</code></td>
+                            <td>退出测试</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <!-- 16个维度 -->
+            <section>
+                <h2>🧠 16个维度介绍</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>维度名称</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><strong>经济维度</strong></td>
+                            <td>从左翼（高税收、政府干预）到右翼（自由市场、私有化）</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><strong>政治维度</strong></td>
+                            <td>从中央集权到权力分散的政治体制偏好</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><strong>社会维度</strong></td>
+                            <td>从传统/保守到进步/自由的社会价值观</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><strong>权力集中度</strong></td>
+                            <td>对强有力领导和秩序的偏好程度</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><strong>军国主义倾向</strong></td>
+                            <td>对国防军事的态度，从和平主义到军事优先</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td><strong>民族主义倾向</strong></td>
+                            <td>国家利益vs全球化，本地化vs国际化</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td><strong>宗教信仰度</strong></td>
+                            <td>宗教在社会和政策中的角色</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td><strong>进步倾向</strong></td>
+                            <td>对社会变革和创新的接受度</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td><strong>传统倾向</strong></td>
+                            <td>对既有制度和习俗的重视程度</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td><strong>环保主义</strong></td>
+                            <td>环保优先还是经济发展优先</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td><strong>个人主义</strong></td>
+                            <td>个人自由和权利的重要性</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td><strong>集体主义</strong></td>
+                            <td>集体利益和社会责任的重要性</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td><strong>科学理性</strong></td>
+                            <td>对科学方法和证据的信任度</td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td><strong>务实主义</strong></td>
+                            <td>注重实际结果vs遵守原则</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td><strong>理想主义</strong></td>
+                            <td>对理想和价值观的坚持程度</td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td><strong>本地化倾向</strong></td>
+                            <td>本地社区vs全球化联系的偏好</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <!-- 结果解读 -->
+            <section>
+                <h2>📊 结果解读</h2>
+                <h3>得分范围</h3>
+                <div class="score-range">
+                    <div class="score-item">
+                        <strong>极端左翼/低分</strong>
+                        <p>&lt; -8 (▼▼)</p>
+                    </div>
+                    <div class="score-item">
+                        <strong>左翼倾向</strong>
+                        <p>-8 ~ -4 (▼)</p>
+                    </div>
+                    <div class="score-item">
+                        <strong>中立立场</strong>
+                        <p>-4 ~ +4 (◄►)</p>
+                    </div>
+                    <div class="score-item">
+                        <strong>右翼倾向</strong>
+                        <p>+4 ~ +8 (▲)</p>
+                    </div>
+                    <div class="score-item">
+                        <strong>极端右翼/高分</strong>
+                        <p>&gt; +8 (▲▲)</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 文档 -->
+            <section>
+                <h2>🎓 文档</h2>
+                <p>详见项目的 <code>docs/</code> 目录：</p>
+                <ul style="margin: 20px 0; padding-left: 30px;">
+                    <li><strong>DIMENSIONS.md</strong> - 各维度详细解读</li>
+                    <li><strong>USAGE.md</strong> - 完整使用指南</li>
+                    <li><strong>QUESTIONS.md</strong> - 全部195道题目列表</li>
+                    <li><strong>RESULTS.md</strong> - 结果解读和案例分析</li>
+                </ul>
+            </section>
+            
+            <!-- 许可证 -->
+            <section>
+                <h2>📄 许可证</h2>
+                <p>本项目采用 <strong>MIT License</strong> 许可证。</p>
+            </section>
+            
+            <!-- 联系方式 -->
+            <section>
+                <h2>📧 联系方式</h2>
+                <p>
+                    <strong>Email:</strong> <a href="mailto:MoHong304@outlook.com">MoHong304@outlook.com</a><br>
+                    <strong>GitHub:</strong> <a href="https://github.com/MoHong-Chineydy" target="_blank">@MoHong-Chineydy</a>
+                </p>
+            </section>
+        </main>
+        
+        <footer>
+            <p><strong>最后更新:</strong> 2026-06-01</p>
+            <p><strong>版本:</strong> 1.0.0</p>
+            <p>© 2026 MoHong-Chineydy. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
