@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9Axes 政治倾向多维分析测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 欢迎屏幕 */
+        .welcome-screen {
+            background: white;
+            border-radius: 16px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .welcome-screen h1 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen p {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .welcome-screen .intro-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .welcome-screen button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .welcome-screen button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 测试界面 */
+        .test-screen {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-header h2 {
+            font-size: 1.5em;
+        }
+
+        .progress-info {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .test-content {
+            display: flex;
+            height: 600px;
+        }
+
+        .statistics-panel {
+            width: 30%;
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .statistics-panel h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .stat-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .questions-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        .question-info {
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+            font-size: 1em;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .option-description {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        /* 结果屏幕 */
+        .results-screen {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 30px;
+        }
+
+        .results-header h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .results-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .results-section h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .dimension-result {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .dimension-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .dimension-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-tendency {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .results-analysis {
+            grid-column: 1 / -1;
+            background: #f0f4ff;
+            padding: 30px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .results-analysis h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .analysis-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .results-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .results-footer button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+
+        .results-footer button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .test-content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .statistics-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .results-content {
+                grid-template-columns: 1fr;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .test-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .progress-info {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+
+            .questions-panel {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 欢迎屏幕 -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>📊 9Axes 政治倾向多维分析测试</h1>
+            <p>发现您在16个维度上的政治立场</p>
+            
+            <div class="intro-box">
+                <p><strong>📋 关于本测试</strong></p>
+                <p>这是一个comprehensive的政治倾向测试，包含 <strong>195道精心设计的题目</strong>，分析您在以下维度上的立场：</p>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li>经济立场、政治体制、社会价值观</li>
+                    <li>权力集中度、军国主义、民族主义</li>
+                    <li>宗教信仰、进步性、传统性</li>
+                    <li>环保主义、个人主义、集体主义</li>
+                    <li>科学理性、务实主义、理想主义、本地化</li>
+                </ul>
+                <p style="margin-top: 15px;">✅ 所有数据完全保密，仅在本地浏览器中处理</p>
+                <p>⏱️ 预计完成时间：15-25分钟</p>
+            </div>
+
+            <button onclick="startTest()">开始测试</button>
+        </div>
+
+        <!-- 测试屏幕 -->
+        <div class="test-screen" id="testScreen">
+            <div class="test-header">
+                <h2>🎯 9Axes 测试</h2>
+                <div class="progress-info">
+                    <div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progressBarFill"></div>
+                        </div>
+                    </div>
+                    <div class="progress-text" id="progressText">0 / 195</div>
+                </div>
+            </div>
+
+            <div class="test-content">
+                <!-- 统计面板 -->
+                <div class="statistics-panel">
+                    <h3>📈 实时数据</h3>
+                    <div id="statisticsContainer"></div>
+                </div>
+
+                <!-- 题目面板 -->
+                <div class="questions-panel">
+                    <div>
+                        <div class="question-info">
+                            <div class="question-number" id="questionNumber"></div>
+                            <div class="question-text" id="questionText"></div>
+                        </div>
+
+                        <div class="options" id="optionsContainer"></div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="skipQuestion()">⊘ 跳过</button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>下一题 →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果屏幕 -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-header">
+                <h1>🎉 测试完成！</h1>
+                <p>您的政治倾向分析结果</p>
+            </div>
+
+            <div class="results-content" id="resultsContent"></div>
+
+            <div class="results-footer">
+                <button onclick="downloadResults()">📥 下载结果</button>
+                <button onclick="shareResults()">📤 分享结果</button>
+                <button onclick="restartTest()">🔄 重新测试</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 题库 ====================
+        const QUESTIONS = [
+            // 经济维度 (0-14)
+            { dimension: 'economic', text: '政府应该通过高税收来重新分配财富，以减少贫富差距。' },
+            { dimension: 'economic', text: '私有企业和自由市场应该是经济的主要驱动力。' },
+            { dimension: 'economic', text: '基本生活保障（食物、住房、医疗）应该由政府确保。' },
+            { dimension: 'economic', text: '累进税制是解决不平等的有效方式。' },
+            { dimension: 'economic', text: '大型企业的垄断行为应该受到严格监管。' },
+            { dimension: 'economic', text: '最低工资法律会导致失业和经济低迷。' },
+            { dimension: 'economic', text: '工会对保护工人权益至关重要。' },
+            { dimension: 'economic', text: '公共医疗系统比私人医疗系统更有效。' },
+            { dimension: 'economic', text: '教育应该是免费和普遍accessible的。' },
+            { dimension: 'economic', text: '政府补贴农业是浪费纳税人的钱。' },
+            { dimension: 'economic', text: '社会福利项目应该被减少以降低政府支出。' },
+            { dimension: 'economic', text: '国有企业比私营企业更有效率。' },
+            { dimension: 'economic', text: '全球贸易自由化对国家经济有益。' },
+            { dimension: 'economic', text: '技术创新应该由市场驱动，而非政府干预。' },
+            { dimension: 'economic', text: '贫困是由于个人失败，而非制度问题。' },
+            
+            // 政治维度 (15-29)
+            { dimension: 'political', text: '权力应该集中在中央政府手中以提高效率。' },
+            { dimension: 'political', text: '地方政府应该拥有更多独立的决策权。' },
+            { dimension: 'political', text: '多党制民主是最好的政治制度。' },
+            { dimension: 'political', text: '在国家安全问题上，政府应该有更多的权力。' },
+            { dimension: 'political', text: '权力的制衡和分权对民主制度至关重要。' },
+            { dimension: 'political', text: '一党制能够更有效地治理国家。' },
+            { dimension: 'political', text: '人民应该直接参与重大政策决定（直接民主）。' },
+            { dimension: 'political', text: '代议制民主优于直接民主。' },
+            { dimension: 'political', text: '政治权力应该世袭和保留给精英阶层。' },
+            { dimension: 'political', text: '普遍成人选举权是现代民主的基础。' },
+            { dimension: 'political', text: '宪法对限制政府权力至关重要。' },
+            { dimension: 'political', text: '司法独立是民主社会的必要条件。' },
+            { dimension: 'political', text: '政府问责和透明度应该是最高优先级。' },
+            { dimension: 'political', text: '权力的集中能够更好地实现国家目标。' },
+            { dimension: 'political', text: '公民参与和监督对民主健康至关重要。' },
+            
+            // 社会维度 (30-44)
+            { dimension: 'social', text: '同性婚姻应该被法律所认可和保护。' },
+            { dimension: 'social', text: '传统家庭价值观对社会稳定至关重要。' },
+            { dimension: 'social', text: '大麻等软性毒品应该被合法化。' },
+            { dimension: 'social', text: '言论自由应该是绝对的，没有任何限制。' },
+            { dimension: 'social', text: '社会应该保护少数族裔和移民的权益。' },
+            { dimension: 'social', text: '堕胎应该是女性的自主选择。' },
+            { dimension: 'social', text: '宗教应该在公共教育中占据突出地位。' },
+            { dimension: 'social', text: '性少数群体应该享有平等的法律地位。' },
+            { dimension: 'social', text: '传统性别角色对社会稳定是必要的。' },
+            { dimension: 'social', text: '文化多元性对社会进步有益。' },
+            { dimension: 'social', text: '色情制品应该被禁止以保护公众道德。' },
+            { dimension: 'social', text: '离婚法律应该更宽松以增加个人自由。' },
+            { dimension: 'social', text: '公共场所表达宗教信仰应该被保护。' },
+            { dimension: 'social', text: '社会应该积极推动性别平等。' },
+            { dimension: 'social', text: '传统婚姻和家庭制度应该被优先支持。' },
+            
+            // 权力集中度 (45-59)
+            { dimension: 'authoritarianism', text: '强大的领导力对国家发展是必要的。' },
+            { dimension: 'authoritarianism', text: '个人自由比安全和秩序更重要。' },
+            { dimension: 'authoritarianism', text: '政府应该详细监控公民的活动以维护安全。' },
+            { dimension: 'authoritarianism', text: '在紧急情况下，执行部门应该拥有绝对权力。' },
+            { dimension: 'authoritarianism', text: '人权应该不受任何政府权力的限制。' },
+            { dimension: 'authoritarianism', text: '国家安全可以证明侵犯隐私是正当的。' },
+            { dimension: 'authoritarianism', text: '强有力的中央权力能够更好地维护社会秩序。' },
+            { dimension: 'authoritarianism', text: '公民应该无条件服从法律和政府命令。' },
+            { dimension: 'authoritarianism', text: '规则和纪律对社会运作至关重要。' },
+            { dimension: 'authoritarianism', text: '个人自由应该受到法律和社会秩序的约束。' },
+            { dimension: 'authoritarianism', text: '警察应该有更广泛的权力来维护秩序。' },
+            { dimension: 'authoritarianism', text: '异议和反对应该受到严格限制。' },
+            { dimension: 'authoritarianism', text: '生命中需要有明确的权威和等级制度。' },
+            { dimension: 'authoritarianism', text: '民众应该能够质疑和反对政府决定。' },
+            { dimension: 'authoritarianism', text: '集体利益应该优先于个人权利。' },
+            
+            // 军国主义 (60-74)
+            { dimension: 'militarism', text: '国防支出对国家来说是必要的投资。' },
+            { dimension: 'militarism', text: '和平解决国际争端总是比军事干预更好。' },
+            { dimension: 'militarism', text: '拥有强大的军队是国家威慑力的基础。' },
+            { dimension: 'militarism', text: '提高军队预算应该是优先事项。' },
+            { dimension: 'militarism', text: '国家不应该干预其他国家的内政。' },
+            { dimension: 'militarism', text: '军事力量是国际谈判中的重要工具。' },
+            { dimension: 'militarism', text: '和平主义是一种幼稚和不切实际的理想。' },
+            { dimension: 'militarism', text: '国防工业是国家经济中至关重要的部分。' },
+            { dimension: 'militarism', text: '军事冲突可以通过外交谈判避免。' },
+            { dimension: 'militarism', text: '拥核国家有权力维护全球和平。' },
+            { dimension: 'militarism', text: '军队在维护国家安全中起关键作用。' },
+            { dimension: 'militarism', text: '过度的军事开支会伤害社会福利计划。' },
+            { dimension: 'militarism', text: '战争永远无法解决根本性的国际分歧。' },
+            { dimension: 'militarism', text: '国防能力决定了国家的国际地位。' },
+            { dimension: 'militarism', text: '国际武装冲突最好通过联合国解决。' },
+            
+            // 民族主义 (75-89)
+            { dimension: 'nationalism', text: '国家利益应该优先于全球利益。' },
+            { dimension: 'nationalism', text: '国际合作和全球治理对未来至关重要。' },
+            { dimension: 'nationalism', text: '本国文化应该得到特别保护和推崇。' },
+            { dimension: 'nationalism', text: '移民限制政策有助于保护本国就业机会。' },
+            { dimension: 'nationalism', text: '全球化对国家经济发展有利。' },
+            { dimension: 'nationalism', text: '国家主权不应该因国际协议而妥协。' },
+            { dimension: 'nationalism', text: '多国企业应该对其本国政府负责。' },
+            { dimension: 'nationalism', text: '文化同化是移民融合的必要条件。' },
+            { dimension: 'nationalism', text: '国家应该优先支持本国产品而非进口商品。' },
+            { dimension: 'nationalism', text: '国际组织应该尊重各国的主权和差异。' },
+            { dimension: 'nationalism', text: '民族身份对社会凝聚力至关重要。' },
+            { dimension: 'nationalism', text: '全球化导致了文化特色的丧失。' },
+            { dimension: 'nationalism', text: '本国公民应该在就业中被优先考虑。' },
+            { dimension: 'nationalism', text: '国际贸易协议通常对本国不利。' },
+            { dimension: 'nationalism', text: '全球化使国家更容易受到外部威胁。' },
+            
+            // 宗教 (90-104)
+            { dimension: 'religion', text: '宗教信仰对社会道德基础至关重要。' },
+            { dimension: 'religion', text: '宗教应该在政治决定中扮演关键角色。' },
+            { dimension: 'religion', text: '政府应该保持完全的世俗性和中立。' },
+            { dimension: 'religion', text: '宗教教育应该是学校课程的重要组成部分。' },
+            { dimension: 'religion', text: '无神论者和信教者应该享有相同的权利和地位。' },
+            { dimension: 'religion', text: '宗教自由是基本人权。' },
+            { dimension: 'religion', text: '宗教机构应该免征税收以支持其使命。' },
+            { dimension: 'religion', text: '政府不应该为宗教活动或建筑提供资金。' },
+            { dimension: 'religion', text: '宗教信仰应该被纳入国家政策制定。' },
+            { dimension: 'religion', text: '世俗社会比宗教社会更加理性和进步。' },
+            { dimension: 'religion', text: '宗教反对科学进步和理性思维。' },
+            { dimension: 'religion', text: '宗教对个人道德发展至关重要。' },
+            { dimension: 'religion', text: '宗教在现代社会中应该衰退。' },
+            { dimension: 'religion', text: '宗教信仰和科学知识可以和谐共存。' },
+            { dimension: 'religion', text: '国家不应该对宗教事务进行任何干预。' },
+            
+            // 进步 (105-119)
+            { dimension: 'progress', text: '社会应该不断进步和改变。' },
+            { dimension: 'progress', text: '传统做事方式通常是最好的。' },
+            { dimension: 'progress', text: '现代化和工业化对人类进步至关重要。' },
+            { dimension: 'progress', text: '保护传统文化和习俗很重要。' },
+            { dimension: 'progress', text: '环境保护应该是社会的首要任务。' },
+            { dimension: 'progress', text: '技术进步总是对社会有益的。' },
+            { dimension: 'progress', text: '我们应该回到更传统和简单的生活方式。' },
+            { dimension: 'progress', text: '社会应该接受和推进新的想法和方式。' },
+            { dimension: 'progress', text: '历史上的传统做法通常比现代替代品更好。' },
+            { dimension: 'progress', text: '进步有时需要打破传统的限制。' },
+            { dimension: 'progress', text: '传统应该被保护以维持社会稳定。' },
+            { dimension: 'progress', text: '创新和改革是解决社会问题的关键。' },
+            { dimension: 'progress', text: '我们的祖先的做事方式值得尊重。' },
+            { dimension: 'progress', text: '社会应该不断发展和改善。' },
+            { dimension: 'progress', text: '人类的最佳时代在过去，而非未来。' },
+            
+            // 环保 (120-134)
+            { dimension: 'environmentalism', text: '环境保护应该优先于经济发展。' },
+            { dimension: 'environmentalism', text: '气候变化是人类面临的最大威胁。' },
+            { dimension: 'environmentalism', text: '绿色能源应该被大力推广和补贴。' },
+            { dimension: 'environmentalism', text: '工业活动对环境的影响应该被严格控制。' },
+            { dimension: 'environmentalism', text: '环境法规通常对经济增长有害。' },
+            { dimension: 'environmentalism', text: '野生动物和生态系统应该被优先保护。' },
+            { dimension: 'environmentalism', text: '可持续发展是经济增长的必要条件。' },
+            { dimension: 'environmentalism', text: '个人消费应该受到限制以保护环境。' },
+            { dimension: 'environmentalism', text: '环保活动家通常过度夸大问题。' },
+            { dimension: 'environmentalism', text: '企业应该为其环境污染承担责任。' },
+            { dimension: 'environmentalism', text: '环境危机主要是由于人类活动引起的。' },
+            { dimension: 'environmentalism', text: '回收和废物管理应该由个人责任推动。' },
+            { dimension: 'environmentalism', text: '林业和土地使用应该受到严格监管。' },
+            { dimension: 'environmentalism', text: '环保技术的成本太高，不切实际。' },
+            { dimension: 'environmentalism', text: '未来世代有权继承健康的地球。' },
+            
+            // 个人主义 (135-149)
+            { dimension: 'individualism', text: '个人自由和权利应该是社会的优先事项。' },
+            { dimension: 'individualism', text: '个人成功应该基于个人努力和才能。' },
+            { dimension: 'individualism', text: '社会应该尊重个人的多样性和差异。' },
+            { dimension: 'individualism', text: '集体利益不应该牺牲个人权利。' },
+            { dimension: 'individualism', text: '竞争促进社会进步和创新。' },
+            { dimension: 'individualism', text: '个人应该对自己的命运负责。' },
+            { dimension: 'individualism', text: '社会义务应该根据个人自愿性。' },
+            { dimension: 'individualism', text: '个人隐私权应该得到绝对保护。' },
+            { dimension: 'individualism', text: '富人应该对穷人有帮助的义务吗？不应该。' },
+            { dimension: 'individualism', text: '个人选择应该不受社会限制。' },
+            { dimension: 'individualism', text: '社会应该优先考虑集体福祉而非个人利益。' },
+            { dimension: 'individualism', text: '共同责任对社会稳定至关重要。' },
+            { dimension: 'individualism', text: '个人应该为社会的进步做出贡献。' },
+            { dimension: 'individualism', text: '集体决策通常比个人决策更好。' },
+            { dimension: 'individualism', text: '团队合作比个人成就更重要。' },
+            
+            // 科学理性 (150-164)
+            { dimension: 'scientific', text: '科学方法是理解世界的最佳方式。' },
+            { dimension: 'scientific', text: '所有医疗决定应该基于科学证据。' },
+            { dimension: 'scientific', text: '进化论是生物学的基础。' },
+            { dimension: 'scientific', text: '疫苗接种对公共健康至关重要。' },
+            { dimension: 'scientific', text: '替代医学通常是伪科学。' },
+            { dimension: 'scientific', text: '科学研究应该不受政治干预。' },
+            { dimension: 'scientific', text: '直觉和传统知识与科学一样有效。' },
+            { dimension: 'scientific', text: '科技发展应该受到伦理审查和限制。' },
+            { dimension: 'scientific', text: '大多数反科学的信念是有害的。' },
+            { dimension: 'scientific', text: '科学应该是政策制定的基础。' },
+            { dimension: 'scientific', text: '气候科学的共识是可靠的。' },
+            { dimension: 'scientific', text: '宗教和科学是不可调和的。' },
+            { dimension: 'scientific', text: '科学研究的资金应该增加。' },
+            { dimension: 'scientific', text: '科技的发展总是有益的。' },
+            { dimension: 'scientific', text: '对科学持怀疑态度是不理性的。' },
+            
+            // 务实主义 (165-179)
+            { dimension: 'pragmatism', text: '实际结果比原则和理想更重要。' },
+            { dimension: 'pragmatism', text: '政治应该基于现实和可行性。' },
+            { dimension: 'pragmatism', text: '妥协通常是解决分歧的最佳方式。' },
+            { dimension: 'pragmatism', text: '道德绝对主义是不切实际的。' },
+            { dimension: 'pragmatism', text: '目标的正确性取决于其结果。' },
+            { dimension: 'pragmatism', text: '理想主义通常导致不切实际的政策。' },
+            { dimension: 'pragmatism', text: '解决问题的最好方法是务实的。' },
+            { dimension: 'pragmatism', text: '原则有时应该为实际利益而妥协。' },
+            { dimension: 'pragmatism', text: '追求理想往往浪费时间和资源。' },
+            { dimension: 'pragmatism', text: '政治中存在绝对的对错是幼稚的想法。' },
+            { dimension: 'pragmatism', text: '道德原则应该指导所有行动。' },
+            { dimension: 'pragmatism', text: '理想和价值观对社会进步至关重要。' },
+            { dimension: 'pragmatism', text: '不应该为了结果而放弃原则。' },
+            { dimension: 'pragmatism', text: '完美不应该阻碍进步。' },
+            { dimension: 'pragmatism', text: '长期的道德立场比短期收益更重要。' },
+            
+            // 理想主义
+            { dimension: 'idealism', text: '理想和价值观应该指导生活的每个方面。' },
+            { dimension: 'idealism', text: '现实总是低于理想。' },
+            { dimension: 'idealism', text: '坚持原则比取得结果更重要。' },
+            { dimension: 'idealism', text: '我们应该为我们所相信的东西而斗争。' },
+            { dimension: 'idealism', text: '一个更好的世界是可能的。' },
+            { dimension: 'idealism', text: '理想应该引导人类的进步。' },
+            { dimension: 'idealism', text: '绝对真理和道德是存在的。' },
+            { dimension: 'idealism', text: '妥协意味着放弃我们的价值观。' },
+            { dimension: 'idealism', text: '个人可以通过坚持理想来改变世界。' },
+            { dimension: 'idealism', text: '大多数全球问题源于道德败坏。' },
+            { dimension: 'idealism', text: '社会应该基于道德原则而非权力。' },
+            { dimension: 'idealism', text: '追求完美是人生的目标。' },
+            { dimension: 'idealism', text: '科技进步应该由道德指导。' },
+            { dimension: 'idealism', text: '人性本质上是善良的。' },
+            { dimension: 'idealism', text: '正义最终将战胜不公正。' },
+            
+            // 本地化 (195-209)
+            { dimension: 'localism', text: '本地生产和消费应该被优先推崇。' },
+            { dimension: 'localism', text: '全球化导致了文化和语言的损失。' },
+            { dimension: 'localism', text: '本地政府比国家政府更有效。' },
+            { dimension: 'localism', text: '社区应该自决而不受国家指导。' },
+            { dimension: 'localism', text: '进口商品应该被本地产品替代。' },
+            { dimension: 'localism', text: '全球贸易对小企业和农民有害。' },
+            { dimension: 'localism', text: '本地食品系统优于工业农业。' },
+            { dimension: 'localism', text: '传统手工艺应该被保护和推广。' },
+            { dimension: 'localism', text: '全球化使财富和权力高度集中。' },
+            { dimension: 'localism', text: '本地多样性应该被视为资产。' },
+            { dimension: 'localism', text: '国际合作和贸易对经济增长至关重要。' },
+            { dimension: 'localism', text: '全球化创造了更多的就业机会。' },
+            { dimension: 'localism', text: '国家市场应该对国际竞争开放。' },
+            { dimension: 'localism', text: '全球供应链提高了商品的可获得性。' },
+            { dimension: 'localism', text: '全球互联网使知识民主化。' }
+        ];
+
+        // ==================== 维度信息 ====================
+        const DIMENSIONS = {
+            economic: { name: '经济维度', desc: '左翼（高税收、政府干预）→ 右翼（自由市场、私有化）' },
+            political: { name: '政治维度', desc: '中央集权 → 权力分散' },
+            social: { name: '社会维度', desc: '传统/保守 → 进步/自由' },
+            authoritarianism: { name: '权力集中度', desc: '个人自由 → 强权集中' },
+            militarism: { name: '军国主义倾向', desc: '和平主义 → 军事优先' },
+            nationalism: { name: '民族主义倾向', desc: '国际合作 → 国家优先' },
+            religion: { name: '宗教信仰度', desc: '世俗化 → 宗教优先' },
+            progress: { name: '进步倾向', desc: '传统优先 → 进步优先' },
+            tradition: { name: '传统倾向', desc: '变革优先 → 传统优先' },
+            environmentalism: { name: '环保主义', desc: '经济优先 → 环保优先' },
+            individualism: { name: '个人主义', desc: '集体优先 → 个人优先' },
+            collectivism: { name: '集体主义', desc: '个人优先 → 集体优先' },
+            scientific: { name: '科学理性', desc: '神秘主义 → 科学理性' },
+            pragmatism: { name: '务实主义', desc: '理想主义 → 务实主义' },
+            idealism: { name: '理想主义', desc: '务实主义 → 理想主义' },
+            localism: { name: '本地化倾向', desc: '全球化 → 本地化' }
+        };
+
+        // ==================== 全局变量 ====================
+        let currentQuestion = 0;
+        let answers = new Array(QUESTIONS.length).fill(null);
+        let scores = {};
+
+        // 初始化维度得分
+        Object.keys(DIMENSIONS).forEach(dim => {
+            scores[dim] = 0;
+        });
+
+        // ==================== 主要函数 ====================
+        function startTest() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('testScreen').style.display = 'block';
+            loadQuestion(0);
+        }
+
+        function loadQuestion(index) {
+            currentQuestion = index;
+            const question = QUESTIONS[index];
+            
+            document.getElementById('questionNumber').textContent = `第 ${index + 1} / ${QUESTIONS.length} 题`;
+            document.getElementById('questionText').textContent = question.text;
+            
+            renderOptions();
+            updateProgress();
+            updateStatistics();
+            
+            // 清除选择状态
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        function renderOptions() {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            const options = [
+                { value: 1, label: '非常反对', desc: '我强烈不同意' },
+                { value: 2, label: '反对', desc: '我倾向反对' },
+                { value: 3, label: '中立', desc: '我保持中立' },
+                { value: 4, label: '同意', desc: '我倾向同意' },
+                { value: 5, label: '非常同意', desc: '我强烈同意' }
+            ];
+            
+            const answeredValue = answers[currentQuestion];
+            
+            options.forEach(option => {
+                const btn = document.createElement('div');
+                btn.className = 'option' + (answeredValue === option.value ? ' selected' : '');
+                btn.innerHTML = `
+                    <span class="option-label">${option.label}</span>
+                    <span class="option-description">${option.desc}</span>
+                `;
+                btn.onclick = () => selectOption(option.value);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(value) {
+            answers[currentQuestion] = value;
+            renderOptions();
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < QUESTIONS.length - 1) {
+                loadQuestion(currentQuestion + 1);
+            } else {
+                calculateScores();
+                showResults();
+            }
+        }
+
+        function skipQuestion() {
+            answers[currentQuestion] = null;
+            if (currentQuestion < QUESTIONS.length - 1) {
+                loadQuestion(currentQuestion + 1);
+            } else {
+                calculateScores();
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const answered = answers.filter(a => a !== null).length;
+            const percentage = (answered / QUESTIONS.length) * 100;
+            
+            document.getElementById('progressBarFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${answered} / ${QUESTIONS.length}`;
+        }
+
+        function updateStatistics() {
+            let tempScores = {};
+            Object.keys(DIMENSIONS).forEach(dim => {
+                tempScores[dim] = 0;
+            });
+            
+            answers.forEach((answer, index) => {
+                if (answer !== null) {
+                    const dimension = QUESTIONS[index].dimension;
+                    const score = answer === 1 ? -2 : answer === 2 ? -1 : answer === 3 ? 0 : answer === 4 ? 1 : 2;
+                    tempScores[dimension] += score;
+                }
+            });
+            
+            const container = document.getElementById('statisticsContainer');
+            container.innerHTML = '';
+            
+            Object.entries(DIMENSIONS).forEach(([key, dim]) => {
+                const score = tempScores[key];
+                const percentage = ((score + 30) / 60) * 100; // 标准化到0-100%
+                
+                const item = document.createElement('div');
+                item.className = 'stat-item';
+                item.innerHTML = `
+                    <div class="stat-label">
+                        <span>${dim.name}</span>
+                        <span class="stat-value">${score > 0 ? '+' : ''}${score}</span>
+                    </div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" style="width: ${Math.max(0, Math.min(100, percentage))}%"></div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function calculateScores() {
+            Object.keys(scores).forEach(dim => {
+                scores[dim] = 0;
+            });
+            
+            answers.forEach((answer, index) => {
+                if (answer !== null) {
+                    const dimension = QUESTIONS[index].dimension;
+                    const score = answer === 1 ? -2 : answer === 2 ? -1 : answer === 3 ? 0 : answer === 4 ? 1 : 2;
+                    scores[dimension] += score;
+                }
+            });
+        }
+
+        function getTendency(score) {
+            if (score < -8) return { text: '极端倾向', icon: '▼▼', color: '#d32f2f' };
+            if (score < -4) return { text: '中等倾向', icon: '▼', color: '#f57c00' };
+            if (score <= 4) return { text: '中立立场', icon: '◄►', color: '#1976d2' };
+            if (score <= 8) return { text: '中等倾向', icon: '▲', color: '#388e3c' };
+            return { text: '极端倾向', icon: '▲▲', color: '#7cb342' };
+        }
+
+        function showResults() {
+            document.getElementById('testScreen').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'block';
+            
+            const container = document.getElementById('resultsContent');
+            container.innerHTML = '';
+            
+            // 主要维度
+            const mainSection = document.createElement('div');
+            mainSection.className = 'results-section';
+            mainSection.innerHTML = '<h2>主要维度分析</h2>';
+            
+            ['economic', 'political', 'social'].forEach(dim => {
+                const score = scores[dim];
+                const tendency = getTendency(score);
+                mainSection.innerHTML += `
+                    <div class="dimension-result">
+                        <div class="dimension-name">${DIMENSIONS[dim].name}</div>
+                        <div class="dimension-score">
+                            <span>${DIMENSIONS[dim].desc}</span>
+                            <span class="score-value" style="color: ${tendency.color}">${score > 0 ? '+' : ''}${score}</span>
+                        </div>
+                        <div class="score-tendency">${tendency.icon} ${tendency.text}</div>
+                    </div>
+                `;
+            });
+            
+            container.appendChild(mainSection);
+            
+            // 详细维度
+            const detailSection = document.createElement('div');
+            detailSection.className = 'results-section';
+            detailSection.innerHTML = '<h2>详细维度数据</h2>';
+            
+            Object.entries(scores).forEach(([dim, score]) => {
+                if (!['economic', 'political', 'social'].includes(dim)) {
+                    const tendency = getTendency(score);
+                    detailSection.innerHTML += `
+                        <div class="dimension-result">
+                            <div class="dimension-name">${DIMENSIONS[dim].name}</div>
+                            <div class="dimension-score">
+                                <span class="score-value" style="color: ${tendency.color}">${score > 0 ? '+' : ''}${score}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            container.appendChild(detailSection);
+            
+            // 分析概览
+            const answered = answers.filter(a => a !== null).length;
+            const confidence = ((answered / QUESTIONS.length) * 100).toFixed(1);
+            
+            const analysisSection = document.createElement('div');
+            analysisSection.className = 'results-analysis';
+            analysisSection.innerHTML = `
+                <h3>📊 测试概览</h3>
+                <div class="analysis-item"><strong>完成度:</strong> ${confidence}% (${answered}/${QUESTIONS.length})</div>
+                <div class="analysis-item"><strong>总体分析:</strong> 基于您的回答，我们已完成了全面的政治倾向分析。您的答案跨越16个不同维度，提供了对您政治观点的深入理解。</div>
+                <div class="analysis-item"><strong>维度说明:</strong> 每个维度的分数范围从 -30 到 +30，负数表示倾向左侧，正数表示倾向右侧，0 表示完全中立。</div>
+            `;
+            
+            container.appendChild(analysisSection);
+        }
+
+        function downloadResults() {
+            let content = '9Axes 政治倾向测试结果\n';
+            content += '='.repeat(50) + '\n\n';
+            content += `完成度: ${((answers.filter(a => a !== null).length / QUESTIONS.length) * 100).toFixed(1)}%\n`;
+            content += `已回答: ${answers.filter(a => a !== null).length}/${QUESTIONS.length}\n\n`;
+            content += '维度得分:\n';
+            
+            Object.entries(scores).forEach(([dim, score]) => {
+                content += `${DIMENSIONS[dim].name}: ${score > 0 ? '+' : ''}${score}\n`;
+            });
+            
+            content += '\n' + new Date().toLocaleString();
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `9axes-results-${Date.now()}.txt`;
+            a.click();
+        }
+
+        function shareResults() {
+            const text = `我完成了9Axes政治倾向测试！完成度: ${((answers.filter(a => a !== null).length / QUESTIONS.length) * 100).toFixed(1)}%`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '9Axes 政治倾向测试',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                alert(text + '\n\n点击上方按钮可分享此链接。');
+            }
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            answers = new Array(QUESTIONS.length).fill(null);
+            Object.keys(scores).forEach(dim => {
+                scores[dim] = 0;
+            });
+            
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('testScreen').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
