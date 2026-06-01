@@ -1,0 +1,27 @@
+# 数据文件
+data/results/
+*.json
+*.csv
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 临时文件
+*.tmp
+*.temp
+*backup*
+
+# OS
+.env
+.env.local
